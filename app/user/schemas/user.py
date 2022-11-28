@@ -23,3 +23,8 @@ class CreateUserResponseSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class LoginResponseSchema(BaseModel):
+    token: str = Field(..., description="Token")
+    refresh_token: str = Field(..., description="Refresh token")
