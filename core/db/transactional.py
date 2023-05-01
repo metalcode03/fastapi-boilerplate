@@ -1,23 +1,14 @@
-from enum import Enum
 from functools import wraps
 
 from core.db import session
 
 
-class Propagation(Enum):
-    REQUIRED = "required"
-    REQUIRED_NEW = "required_new"
-
-
 class Transactional:
-    def __init__(self, propagation: Propagation = Propagation.REQUIRED):
-        self.propagation = propagation
-
-    def __call__(self, function):
-        @wraps(function)
-        async def decorator(*args, **kwargs):
+    def __call__(self, func):
+        @wraps(func)
+        async def _transactional(*args, **kwargs):
             try:
-                result = await function(*args, **kwargs)
+                result = await func(*args, **kwargs)
                 await session.commit()
             except Exception as e:
                 await session.rollback()
@@ -25,4 +16,4 @@ class Transactional:
 
             return result
 
-        return decorator
+        return _transactional
